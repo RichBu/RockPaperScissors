@@ -68,6 +68,12 @@
             </div>
         </div>
         <div class="row ">
+            <h3> Current Users on-line : </h3>
+            <div id="currUsers">
+                <span>me</span>
+            </div>
+        </div>
+        <div class="row ">
             <h3> Status: </h3>
             <span id="numUsers"></span>
         </div>
@@ -134,7 +140,7 @@
                 //test button was pushed
                 console.log("test button has been pressed");
                 //database.ref("/games").push( connectionObj.currUserRec );
-                dbUserStorageArea.set( connectionObj.currUserRec );
+                dbUserStorageArea.set(connectionObj.currUserRec);
             });
 
 

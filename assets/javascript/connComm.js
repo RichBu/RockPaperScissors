@@ -58,7 +58,7 @@ var connectionObj = {
     },
 
     setUserReadyToPlay: function () {
-        this.currUserRec.isPlaying = true;  //is it a server ?
+        this.currUserRec.isPlaying = false;  //not currently playing
         this.currUserRec.playingAgainstID = "";
         this.currUserRec.playingAgainstName = "";    //who playing with by name
         this.currUserRec.userWins = 0;
@@ -84,10 +84,10 @@ var connectionObj = {
 
     clearLocalStack: function () {
         //go thru the entire stack and pop off
-        var endVal = usersOnLine.length;
+        var endVal = this.usersOnLine.length;
         for (var i = 0; i < endVal; i++) {
-            usersOnLine.pop();
-        }
+            this.usersOnLine.pop();
+        };
     },
 
     getAllUsersOnLine: function () {
@@ -105,6 +105,20 @@ var connectionObj = {
                     console.log(childData.userID +  " " + childData.name );
                 });
             });
+    },
+
+    retUserOnLineName: function( userNum ) {
+        //returns the users name from the array
+        var outVal = "";
+        outVal = connectionObj.usersOnLine[userNum].name;
+        return outVal;
+    },
+
+    retUserOnLineRec: function( userNum ) {
+        //not sure this is an editable object
+        //but returns the entire object
+        var outVal = connectionObj.usersOnLine[userNum];
+        return outVal;        
     },
 
     EOR: ""    //place keeper
@@ -157,6 +171,7 @@ var startConnection = function () {
         dbUserStorageArea = database.ref(connectionObj.currUserRec.userID);
         dbUserStorageArea.onDisconnect().remove();
         showLinkButtonStatus();
+        dispAllUsersOnPage(true);   //refresh entire area
     });
 };
 
