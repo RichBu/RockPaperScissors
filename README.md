@@ -1,2 +1,2 @@
-# RockPaperScissors
-Multi-player rock paper scissors
+# EquipDemo
+Demo of linking equipment together

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="eng-us">
+
+<!-- index.html  of  Rock Paper Scissors program
+    
+    by Rich Budek  02/14/2018
+
+
+    made to demonstrate on-line data linking of a game
+
+    uses Rich Budek's private database
+
+
+-->
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rich Budek's Rock Paper Scissors</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- load in a reset of CSS  -->
+    <!-- *RPB  redo the styles after loading in the rest.css  -->
+    <!-- <link rel="stylesheet" type="text/css" href="assets/css/reset.css">   -->
+    <!-- load my style sheet -->
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-default" id="navBarCommon">
+        <!--  NavBar is loaded in JS based on id="navBarCommon" -->
+        <!--  this makes the NavBar be the same across all the web pages -->
+    </nav>
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- top row, make it two columns for smaller screens -->
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
+                <!-- This is coumn of heading -->
+                <div>
+                    <!-- <div>  -->
+                    <p>
+                        <h1>Rock Paper Scissors</h1>
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-8 col-sm-6 col xs-6 ">
+                <!--                    <div class="row visible-lg-block visible-md-block hidden-sm hidden-xs">   -->
+                <div class="row">
+                    <p>
+                        <h2> </h2>
+                    </p>
+                </div>
+                <div class="row ">
+                    <!-- This is the column with buttons -->
+                    <button style="Float: left; " id="btnLink" class="bigButton " data-toggle="tooltip " title="Initiate an on-line link">LINK</button>
+                    <button style="Float: left; " id="btnStart" class="bigButton " data-toggle="tooltip " title="start the game">START</button>
+                    <button style="Float: left; " id="btnTest" class="bigButton " data-toggle="tooltip " title="test">TEST</button>
+                    <button style="Float: left; " id="btnHelp" class="bigButton " data-toggle="tooltip " title="Help and about">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                    </button>
+                    <button style="Float: left; " id="btnSettings" class="bigButton " data-toggle="tooltip " title="Settings for game">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row ">
+            <h3> Status: </h3>
+            <span id="numUsers"></span>
+        </div>
+        <div class="row" id="inputForm">
+            <form id="user-form">
+                <label for="text-input">User Name</label>
+                <input type="text" id="input-userName">
+                <!-- Button triggers new movie to be added -->
+                <input id="bttnUserInput" type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <span class="label label-default">Copyright &COPY; 2018 Rich Budek</span>
+    </div>
+
+
+    <!--  Load Javascript libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+
+    <!-- Numeral library for formatting numbers  -->
+    <script src="assets/javascript/numeral.js"></script>
+
+    <!-- load my custom js for this project -->
+    <script src="assets/javascript/globals.js"></script>
+    <script src="assets/javascript/script.js"></script>
+    <script src="assets/javascript/connComm.js"></script>
+    <!--
+    <script src="assets/javascript/script_modals.js"></script>
+    <script src="assets/javascript/script_words.js"></script>
+    <script src="assets/javascript/script_play.js"></script>
+    -->
+
+    <script>
+
+        $(document).ready(function () {
+            //activate BootStrap tool tips
+            //but don't turn on for phone / tablet
+            $('[data-toggle="tooltip"]').tooltip();
+
+            /* global moment firebase */
+            // Initialize Firebase
+            // Make sure to match the configuration to the script version number in the HTML
+            // (Ex. 3.0 != 3.7.0)
+
+            showLinkButtonStatus();
+
+            $(configData.idBttnLink).on("click", startConnection);
+
+            $(configData.idBttnUserInput).on("click", function (event) {
+                //submit button was pushed
+                console.log("submit clicked");
+                event.preventDefault();
+                connectionObj.initCurrUserRec();
+                connectionObj.currUserRec.name = $(configData.inputUserName).val().trim();
+                connectionObj.setUserReadyToPlay();
+            });
+
+            $(configData.idBttnTest).on("click", function (event) {
+                //test button was pushed
+                console.log("test button has been pressed");
+                //database.ref("/games").push( connectionObj.currUserRec );
+                dbUserStorageArea.set( connectionObj.currUserRec );
+            });
+
+
+            //fire base layous
+            // - connections = all the connected users
+            // - games = all the games being played
+            // - history = for high scores store high score and %
+
+            //sequence for login:
+            //take number of connections, add it to "user"
+            //this become ID and the node to place data at
+            //set is Playing to false
+            //store record in the "games" node
+            //
+            //look for isPlaying = false
+            //
+
+
+        });
+
+    </script>
+</body>
+
+</html>
