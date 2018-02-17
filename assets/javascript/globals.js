@@ -29,11 +29,8 @@ var dispAllUsersOnPage = function (shouldRefresh) {
     //if want to pull all the data in, then set refresh to true
     //this function assumes that all the data is already in the array if not
     //first make sure that it is on-line
-    var endVal = connectionObj.usersOnLine.length;
-    console.log("# users = " + endVal);
     if (connectionObj.linkActive) {
         //only if link is active
-        console.log("displaying the users");
         if (shouldRefresh) {
             connectionObj.clearLocalStack();
             connectionObj.getAllUsersOnLine();
@@ -48,11 +45,9 @@ var dispAllUsersOnPage = function (shouldRefresh) {
         $(statusHeaderText).appendTo(statusHeader);
         $(statusHeader).appendTo(rowStatusHeader);
         $(rowStatusHeader).appendTo(divCurrUsers);
-        console.log("added user");
 
         //now loop thru all the names and put on-line
         var endVal = connectionObj.usersOnLine.length;
-        console.log("# users = " + endVal);
         for (var i = 0; i < endVal; i++) {  //each new button is on a new row
             var newRow = $("<div>");
             $(newRow).addClass("row");
