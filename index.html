@@ -105,11 +105,6 @@
     <script src="assets/javascript/globals.js"></script>
     <script src="assets/javascript/script.js"></script>
     <script src="assets/javascript/connComm.js"></script>
-    <!--
-    <script src="assets/javascript/script_modals.js"></script>
-    <script src="assets/javascript/script_words.js"></script>
-    <script src="assets/javascript/script_play.js"></script>
-    -->
 
     <script>
 
@@ -134,13 +129,16 @@
                 connectionObj.initCurrUserRec();
                 connectionObj.currUserRec.name = $(configData.inputUserName).val().trim();
                 connectionObj.setUserReadyToPlay();
+                console.log("set user to play");
+                startConnection();  //start connection
+                console.log("connected");
             });
 
             $(configData.idBttnTest).on("click", function (event) {
                 //test button was pushed
                 console.log("test button has been pressed");
                 //database.ref("/games").push( connectionObj.currUserRec );
-                dbUserStorageArea.set(connectionObj.currUserRec);
+                connectionObj.writeCurrUserRec();
             });
 
 

@@ -35,6 +35,7 @@ var connectionObj = {
     currUserRec: userType,
     linkActive: false,  //link is false until turned on
     currNumberOfConn: 0,   //number of connections brought out from event listener
+    refreshScreenBit: true,
 
     userRecStore: {   //record stored to database
 
@@ -70,9 +71,9 @@ var connectionObj = {
         this.currUserRec.opponentChoice = "";         //R, P, S        
     },
 
-    pushToLocalStack: function ( recObjIn ) {
+    pushToLocalStack: function (recObjIn) {
         //adds to local stack from userType varb
-        var newUser = jQuery.extend(true, {}, recObjIn );
+        var newUser = jQuery.extend(true, {}, recObjIn);
         this.usersOnLine.push(newUser);
     },
 
@@ -101,25 +102,41 @@ var connectionObj = {
                     // childData will be the actual contents of the child
                     var childData = childSnapshot.val();
                     var newRecObj = jQuery.extend(true, {}, childData);
-                    connectionObj.pushToLocalStack( newRecObj );
-                    console.log(childData.userID +  " " + childData.name );
+                    connectionObj.pushToLocalStack(newRecObj);
+                    console.log(childData.userID + " " + childData.name);
                 });
+                dispAllUsersOnPage_contin();
             });
     },
 
-    retUserOnLineName: function( userNum ) {
+    writeCurrUserRec: function () {
+        dbUserStorageArea.set(connectionObj.currUserRec);
+        //connectionObj.triggerRefreshScreen();
+    },
+
+    triggerRefreshScreen: function () {
+        connectionObj.refreshScreenBit = !connectionObj.refreshScreenBit;
+        if ( connectionObj.refreshScreenBit ){
+            dbRefreshScreenBit.set(true);
+        } else {
+            dbRefreshScreenBit.set(false);
+        };
+    },
+
+    retUserOnLineName: function (userNum) {
         //returns the users name from the array
         var outVal = "";
         outVal = connectionObj.usersOnLine[userNum].name;
         return outVal;
     },
 
-    retUserOnLineRec: function( userNum ) {
+    retUserOnLineRec: function (userNum) {
         //not sure this is an editable object
         //but returns the entire object
         var outVal = connectionObj.usersOnLine[userNum];
-        return outVal;        
+        return outVal;
     },
+
 
     EOR: ""    //place keeper
 };
@@ -130,7 +147,7 @@ var connectionObj = {
 var startConnection = function () {
     console.log("connecting");
     firebase.initializeApp(connConfig);
-
+console.log("entered the routine");
     // Create a variable to reference the database.
     database = firebase.database();
 
@@ -139,6 +156,8 @@ var startConnection = function () {
     // All of our connections will be stored in this directory.
     connectionsRef = database.ref("/connections");
     dbUserGameStorageMain = database.ref(configData.firebaseMainGame);
+    dbUserStatusFolder = database.ref(configData.firebaseStatusFolder);
+    dbRefreshScreenBit = database.ref(configData.firebaseRefreshBit);
 
     // '.info/connected' is a special location provided by Firebase that is updated every time
     // the client's connection state changes.
@@ -156,22 +175,40 @@ var startConnection = function () {
 
             // Remove user from the connection list when they disconnect.
             con.onDisconnect().remove();
-        }
+            }
+    });
+
+    dbRefreshScreenBit.on("value", function (snap) {
+        //refresh bit has been triggers
+        console.log(snap);
+        // If they are connected..
+        if (snap.val()) {   //executes with the value is finally set to true
+            connectionObj.refreshScreenBit = true;
+        } else {
+            connectionObj.refreshScreenBit = false;
+        };
+            //refresh the user list
+        //dispAllUsersOnPage_start(true);
     });
 
     // When first loaded or when the connections list changes...
     connectionsRef.on("value", function (snap) {
-
         // Display the viewer count in the html.
         // The number of online users is the number of children in the connections list.
         connectionObj.currNumberOfConn = snap.numChildren();
         $("#numUsers").text(connectionObj.currNumberOfConn + " active connections");
-        connectionObj.linkActive = true;  //link is active
-        connectionObj.currUserRec.userID = configData.firebaseStorage + numeral(connectionObj.currNumberOfConn).format("0000");
-        dbUserStorageArea = database.ref(connectionObj.currUserRec.userID);
-        dbUserStorageArea.onDisconnect().remove();
-        showLinkButtonStatus();
-        dispAllUsersOnPage(true);   //refresh entire area
+        //only change the user name if the linkActice switches
+        if (connectionObj.linkActive === false) {
+            connectionObj.linkActive = true;  //link is active
+            connectionObj.currUserRec.userID = configData.firebaseStorage + numeral(connectionObj.currNumberOfConn).format("0000");
+            dbUserStorageArea = database.ref(connectionObj.currUserRec.userID);
+            dbUserStorageArea.onDisconnect().remove();
+console.log("started the connection");
+            connectionObj.writeCurrUserRec();
+//            dispAllUsersOnPage_start(true);   //refresh entire area
+            showLinkButtonStatus();
+        };
+        dispAllUsersOnPage_start(true);
     });
 };
 
