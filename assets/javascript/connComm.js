@@ -6,6 +6,7 @@
 
 
 //connConfig is set to global in the globals.js
+
 connConfig = {
     apiKey: "AIzaSyDAnVeqfmMPjDq_vosN1R9NnMoHJQRsW3k",
     authDomain: "rockpaperscissors-21cc5.firebaseapp.com",
@@ -21,13 +22,17 @@ var userType = {        //stored in database
     name: "",           //user name, if known
     isPlaying: false,   //does he have a partner
     status: "",        //waiting for response, ack choice 
-    playingAgainstID: "",
-    playingAgainstName: "",    //who playing with by name
+    opponentID: "",
+    opponentName: "",    //who playing with by name
+    msgOutgoing: "",     //outgoing message to opponent
+    msgIncoming: "",     //message coming in from opponent
     userScore: 0,
     userChoice: "",            //R, P, S  
-    //-=ack/waiting  ?=want to play
+    //?=want to play  -=new trial
     opponentScore: 0,
     opponentChoice: "",         //R, P, S
+    ACKout: "",        //acknowledge opponent answer. rst by opp, set to ack
+    ACKin: "", //ack from opponent. user resets, waits for opp to set ACK
     EOR: ""                    //place keeper
 };
 
@@ -103,7 +108,6 @@ var connectionObj = {
                     var childData = childSnapshot.val();
                     var newRecObj = jQuery.extend(true, {}, childData);
                     connectionObj.pushToLocalStack(newRecObj);
-                    console.log(childData.userID + " " + childData.name);
                 });
                 dispAllUsersOnPage_contin();
             });
@@ -208,7 +212,8 @@ console.log("started the connection");
 //            dispAllUsersOnPage_start(true);   //refresh entire area
             showLinkButtonStatus();
         };
-        dispAllUsersOnPage_start(true);
+        console.log("new connection detected");
+        setTimeout ( dispAllUsersOnPage_start(true), 5000  ); 
     });
 };
 

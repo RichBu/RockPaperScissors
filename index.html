@@ -122,6 +122,8 @@
 
             $(configData.idBttnLink).on("click", startConnection);
 
+            $(document.body).on("click", ".user_select", evalUserSelect);
+
             $(configData.idBttnUserInput).on("click", function (event) {
                 //submit button was pushed
                 console.log("submit clicked");
@@ -145,6 +147,7 @@
             //fire base layous
             // - connections = all the connected users
             // - games = all the games being played
+            // - status = reset bit to refresh screens outside of using connections
             // - history = for high scores store high score and %
 
             //sequence for login:
