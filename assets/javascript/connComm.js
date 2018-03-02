@@ -28,7 +28,7 @@ var userType = {        //stored in database
     msgIncoming: "",     //message coming in from opponent
     userScore: 0,
     userChoice: "",            //R, P, S  
-    //?=want to play  -=new trial
+    //?=want to play  -=new trial  X=denied reques to play A=accept
     opponentScore: 0,
     opponentChoice: "",         //R, P, S
     ACKout: "",        //acknowledge opponent answer. rst by opp, set to ack
@@ -141,7 +141,6 @@ var connectionObj = {
         return outVal;
     },
 
-
     EOR: ""    //place keeper
 };
 
@@ -204,8 +203,10 @@ console.log("entered the routine");
         //only change the user name if the linkActice switches
         if (connectionObj.linkActive === false) {
             connectionObj.linkActive = true;  //link is active
-            connectionObj.currUserRec.userID = configData.firebaseStorage + numeral(connectionObj.currNumberOfConn).format("0000");
-            dbUserStorageArea = database.ref(connectionObj.currUserRec.userID);
+            //connectionObj.currUserRec.userID = configData.firebaseStorage + numeral(connectionObj.currNumberOfConn).format("0000");
+            // connectionObj.currUserRec.userID = configData.firebaseStorage + firebase.database.ServerValue.TIMESTAMP;            
+            connectionObj.currUserRec.userID = configData.firebaseStorage + moment().valueOf();            
+            dbUserStorageArea = database.ref(connectionObj.currUserRec.userID);          
             dbUserStorageArea.onDisconnect().remove();
 console.log("started the connection");
             connectionObj.writeCurrUserRec();
