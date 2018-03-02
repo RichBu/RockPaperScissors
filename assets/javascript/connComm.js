@@ -28,7 +28,7 @@ var userType = {        //stored in database
     msgIncoming: "",     //message coming in from opponent
     userScore: 0,
     userChoice: "",            //R, P, S  
-    //?=want to play  -=new trial  X=denied reques to play A=accept
+    //?=want to play  -=new trial  X=denied request to play A=accept
     opponentScore: 0,
     opponentChoice: "",         //R, P, S
     ACKout: "",        //acknowledge opponent answer. rst by opp, set to ack
@@ -53,8 +53,8 @@ var connectionObj = {
         //this.currUserRec.userID = "";             //user ID, usually just sequence number
         this.currUserRec.name = "";           //user name, if known
         this.currUserRec.isPlaying = false;  //is it a server ?
-        this.currUserRec.playingAgainstID = "";
-        this.currUserRec.playingAgainstName = "";    //who playing with by name
+        this.currUserRec.opponentID = "";
+        this.currUserRec.opponentName = "";    //who playing with by name
         this.currUserRec.userWins = 0;
         this.currUserRec.userLosses = 0;
         this.currUserRec.userChoice = "";            //R, P, S
@@ -65,8 +65,8 @@ var connectionObj = {
 
     setUserReadyToPlay: function () {
         this.currUserRec.isPlaying = false;  //not currently playing
-        this.currUserRec.playingAgainstID = "";
-        this.currUserRec.playingAgainstName = "";    //who playing with by name
+        this.currUserRec.opponentID = "";
+        this.currUserRec.opponentName = "";    //who playing with by name
         this.currUserRec.userWins = 0;
         this.currUserRec.userLosses = 0;
         this.currUserRec.userChoice = "";            //R, P, S
@@ -114,7 +114,7 @@ var connectionObj = {
     },
 
     writeCurrUserRec: function () {
-        dbUserStorageArea.set(connectionObj.currUserRec);
+        dbUserStorageArea.set(connectionObj.currUserRec.ACKout);
         //connectionObj.triggerRefreshScreen();
     },
 

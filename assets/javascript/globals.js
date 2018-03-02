@@ -25,6 +25,8 @@ var connectedRef;
 var dbUserGameStorageMain;
 var dbUserStorageArea;
 var dbUserStatusFolder;
+
+var dbOppStorageArea;
 var dbRefreshScreenBit;
 
 Date.prototype.getUnixTime = function() { return this.getTime()/1000|0 };
@@ -35,8 +37,22 @@ var gameObj = {
     //everything for playing the game
     currStatus: { 
         //object for current status
-        stateLevel: 0  //state of the game play
+        stateLevel: 0,  //state of the game play
+        retStatus: function() {
+            //returns status of current game
+            statusMessage = [
+                'startup waiting for user login',   //0
+                'waiting to read number of users',  //1
+                'waiting to pick opponent',         //2
+                '',                                 //3
+                '',                                 //4
+                'waiting for ACK to start a game',          //5  A=accept  X=deny
+                'waiting for both answers to come in ',     //10
+                'processing the game '                      //15
+            ];
+        }
     }
+
 };
 
 
@@ -81,7 +97,7 @@ var dispAllUsersOnPage_contin = function () {
             var newLine = $("<p>");
             var lineText = connectionObj.retUserOnLineName(i);
             if (connectionObj.retUserOnLineRec(i).isPlaying) {
-                lineText += " playing against " + connectionObj.retUserOnLineRec(i).playingAgainstName;
+                lineText += " playing against " + connectionObj.retUserOnLineRec(i).opponentName;
             } else {
                 lineText += " free to play";
             };
@@ -126,12 +142,17 @@ var evalUserSelect = function() {
     var cuStack = connectionObj.usersOnLine;  //use as input
     var oppRec = cuStack[userClick]; //the actual record of the opponent
     var currRec = connectionObj.currUserRec;  //use as output
-    currRec.opponentID = oppRec.userID;
-    currRec.opponentName = oppRec.name;
-    currRec.userChoice = "?";
-    currRec.ACKout = "ACK";
-    currRec.ACKin = "RST";
-debugger;
+    if( oppRec.userID === currRec.userID) {
+        //user picked himself
+        alert( "you picked yourself");
+    } else {
+        dbOppStorageArea = database.ref( oppRec.currUserRec.userID );
+        currRec.opponentID = oppRec.userID;
+        currRec.opponentName = oppRec.name;
+        currRec.userChoice = "?";
+        currRec.ACKout = "ACK";
+        currRec.ACKin = "RST";    
+    };
 };
 
 
