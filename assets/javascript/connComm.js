@@ -40,6 +40,7 @@ var userType = {        //stored in database
     EOR: ""                    //place keeper
 };
 
+
 var connectionObj = {
     currUserRec: userType,
     linkActive: false,  //link is false until turned on
@@ -154,9 +155,9 @@ var connectionObj = {
     },
 
 
-    writeDBtoInRec: function( dataInRec ) {
+    writeDBtoInRec: function (dataInRec) {
         //copies incoming record to memory slot
-        this.currUserRec.inRec = jQuery.extend( true, {}, dataInRec.val() );
+        this.currUserRec.inRec = jQuery.extend(true, {}, dataInRec.val());
     },
 
 
@@ -215,6 +216,7 @@ var startConnection = function () {
         }
     });
 
+
     dbRefreshScreenBit.on("value", function (snap) {
         //refresh bit has been triggers
         console.log(snap);
@@ -260,8 +262,29 @@ var startConnection = function () {
 };
 
 
-var evalIncomingRec = function() {
-    console.log("incoming record from: " + connectionObj.currUserRec.inRec.name );
+var evalIncomingRec = function () {
+    console.log("incoming record from: " + connectionObj.currUserRec.inRec.name);
+    switch (connectionObj.currUserRec.inRec.choice) {
+        case "A":  //accepted invite for game
+            connectionObj.currUserRec.isPlaying = true;
+            connectionObj.currUserRec.outRec.choice = "-";
+            connectionObj.writeCurrUserRec();  
+            break;
+        case "-":   //ready for game to begin
+            break;
+        case "?":   //wants to play a game
+            gameObj.promptWantNewGame();
+            break;
+        case "X":   //refused game or disconnect
+            break;
+        case "R":   //picked rock
+            break;
+        case "P":   //picked paper
+            break;
+        case "S":   //picked scissors
+            break;
+    };
+
 };
 
 

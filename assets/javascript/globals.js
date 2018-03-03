@@ -52,8 +52,28 @@ var gameObj = {
                 'processing the game '                      //15
             ];
         }
-    }
+    },
 
+    promptWantNewGame: function() {
+        var promptStr = connectionObj.currUserRec.inRec.name + " wants to play a game \n";
+        promptStr += "type Yes to continue ";
+        var ansPlayGame = prompt( promptStr, "Yes" );  
+        ansPlayGame = "Yes"; // default
+        ansPlayGame = ansPlayGame.trim().toUpperCase();
+        var userAnsChar = ansPlayGame[0];
+        if( userAnsChar === "Y" ) {
+            //the user picked yes
+            //set the "A" bit, and write the record
+            connectionObj.currUserRec.outRec.choice = "A";
+            //set up the storage pointer
+            connectionObj.currUserRec.isPlaying = true;
+            dbOppStorageArea = database.ref( connectionObj.currUserRec.inRec.ID + "/inRec" );
+            //write the entire record including the outRec
+            //this is because want to set "IsPlaying"
+            connectionObj.writeCurrUserRec();  
+            connectionObj.writeToOppRec();
+        };
+    }
 };
 
 
