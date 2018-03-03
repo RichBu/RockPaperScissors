@@ -26,6 +26,7 @@ var dbUserGameStorageMain;
 var dbUserStorageArea;
 var dbUserStatusFolder;
 
+var dbIncomingRec;
 var dbOppStorageArea;
 var dbRefreshScreenBit;
 
@@ -97,7 +98,7 @@ var dispAllUsersOnPage_contin = function () {
             var newLine = $("<p>");
             var lineText = connectionObj.retUserOnLineName(i);
             if (connectionObj.retUserOnLineRec(i).isPlaying) {
-                lineText += " playing against " + connectionObj.retUserOnLineRec(i).opponentName;
+                lineText += " playing against " + connectionObj.retUserOnLineRec(i).inRec.name;
             } else {
                 lineText += " free to play";
             };
@@ -140,18 +141,28 @@ var evalUserSelect = function() {
     //so store the users info into the currUserRec
     //make some short handed annotation for usage
     var cuStack = connectionObj.usersOnLine;  //use as input
-    var oppRec = cuStack[userClick]; //the actual record of the opponent
+    var oppRec = cuStack[userClick].outRec; //the actual record of the opponent
     var currRec = connectionObj.currUserRec;  //use as output
-    if( oppRec.userID === currRec.userID) {
+    if( oppRec.ID === currRec.outRec.ID) {
         //user picked himself
         alert( "you picked yourself");
     } else {
-        dbOppStorageArea = database.ref( oppRec.currUserRec.userID );
-        currRec.opponentID = oppRec.userID;
-        currRec.opponentName = oppRec.name;
-        currRec.userChoice = "?";
-        currRec.ACKout = "ACK";
-        currRec.ACKin = "RST";    
+        //out record goes to the in record of the opponent
+        dbOppStorageArea = database.ref( oppRec.ID + "/inRec" );
+    
+        currRec.inRec.ID = oppRec.ID;
+        currRec.inRec.name = oppRec.name;
+        currRec.inRec.msg = oppRec.msg;
+        currRec.inRec.choice = oppRec.choice;
+        currRec.inRec.score = oppRec.score;
+        currRec.inRec.ACK = oppRec.ACK;
+
+        currRec.outRec.choice = "?";
+        currRec.outRec.ACK = "ACK";
+        currRec.outRec.score = 0;
+        //currRec.inRec.ACK = "RST";    
+        connectionObj.writeCurrUserRec();
+        connectionObj.writeToOppRec();
     };
 };
 

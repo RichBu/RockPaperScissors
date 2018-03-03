@@ -18,21 +18,25 @@ connConfig = {
 
 
 var userType = {        //stored in database
-    userID: "",         //user ID, usually just sequence number
-    name: "",           //user name, if known
     isPlaying: false,   //does he have a partner
     status: "",        //waiting for response, ack choice 
-    opponentID: "",
-    opponentName: "",    //who playing with by name
-    msgOutgoing: "",     //outgoing message to opponent
-    msgIncoming: "",     //message coming in from opponent
-    userScore: 0,
-    userChoice: "",            //R, P, S  
     //?=want to play  -=new trial  X=denied request to play A=accept
-    opponentScore: 0,
-    opponentChoice: "",         //R, P, S
-    ACKout: "",        //acknowledge opponent answer. rst by opp, set to ack
-    ACKin: "", //ack from opponent. user resets, waits for opp to set ACK
+    inRec: {  //outgoing Record to opppnent
+        ID: "",         //opp ID
+        name: "",       //opp name
+        msg: "",        //opp mag
+        choice: "",    //opp choice
+        score: 0,      //opp score
+        ACK: ""        //opp outgoing ACK
+    },
+    outRec: {  //outgoing Record to opppnent
+        ID: "",      //this user's ID
+        name: "",    //this is username          
+        msg: "",     //outgoing message to opponent
+        choice: "", //users choice
+        score: 0,   //users score
+        ACK: ""
+    },
     EOR: ""                    //place keeper
 };
 
@@ -51,30 +55,39 @@ var connectionObj = {
 
     initCurrUserRec: function () {
         //this.currUserRec.userID = "";             //user ID, usually just sequence number
-        this.currUserRec.name = "";           //user name, if known
-        this.currUserRec.isPlaying = false;  //is it a server ?
-        this.currUserRec.opponentID = "";
-        this.currUserRec.opponentName = "";    //who playing with by name
-        this.currUserRec.userWins = 0;
-        this.currUserRec.userLosses = 0;
-        this.currUserRec.userChoice = "";            //R, P, S
-        this.currUserRec.opponentWins = 0;
-        this.currUserRec.opponentLossea = 0;
-        this.currUserRec.opponentChoice = "";         //R, P, S
+        this.currUserRec.isPlaying = false; //is user currently playing a game ?
+        this.currUserRec.status = "";       //status of user
+
+        //incoming record is opponents stats
+        this.currUserRec.inRec.ID = "";
+        this.currUserRec.inRec.name = "";    //who playing with by name            
+        this.currUserRec.inRec.msg = "";     //outgoing message to opponent
+        this.currUserRec.inRec.choice = "";
+        this.currUserRec.inRec.score = 0;
+        this.currUserRec.inRec.score = "";
+
+        //outgoing record is user data
+        this.currUserRec.outRec.ID = "";
+        this.currUserRec.outRec.name = "";    //who playing with by name            
+        this.currUserRec.outRec.msg = "";     //outgoing message to opponent
+        this.currUserRec.outRec.choice = "";
+        this.currUserRec.outRec.score = 0;
+        this.currUserRec.outRec.ACK = "";
     },
+
 
     setUserReadyToPlay: function () {
         this.currUserRec.isPlaying = false;  //not currently playing
-        this.currUserRec.opponentID = "";
-        this.currUserRec.opponentName = "";    //who playing with by name
-        this.currUserRec.userWins = 0;
-        this.currUserRec.userLosses = 0;
-        this.currUserRec.userChoice = "";            //R, P, S
-        this.currUserRec.opponentScore = 0;
-        this.currUserRec.opponentWins = 0;
-        this.currUserRec.opponentLossea = 0;
-        this.currUserRec.opponentChoice = "";         //R, P, S        
+
+        this.currUserRec.outRec.choice = "";    //R,  P,  S
+        this.currUserRec.inRec.ID = "";
+        this.currUserRec.inRec.name = "";    //who playing with by name            
+        this.currUserRec.inRec.msg = "";     //outgoing message to opponent
+        this.currUserRec.inRec.choice = "";
+        this.currUserRec.inRec.score = 0;
+        this.currUserRec.inRec.ACK = "";
     },
+
 
     pushToLocalStack: function (recObjIn) {
         //adds to local stack from userType varb
@@ -82,11 +95,13 @@ var connectionObj = {
         this.usersOnLine.push(newUser);
     },
 
+
     pushToLocalStack_w_Clear: function () {
         //push current userType to stack & then clear userType
         this.pushToLocalStack();
         this.init();
     },
+
 
     clearLocalStack: function () {
         //go thru the entire stack and pop off
@@ -95,6 +110,7 @@ var connectionObj = {
             this.usersOnLine.pop();
         };
     },
+
 
     getAllUsersOnLine: function () {
         //will loop thru and get all the users on-line
@@ -113,26 +129,44 @@ var connectionObj = {
             });
     },
 
+
     writeCurrUserRec: function () {
-        dbUserStorageArea.set(connectionObj.currUserRec.ACKout);
+        dbUserStorageArea.set(connectionObj.currUserRec);
         //connectionObj.triggerRefreshScreen();
     },
 
+
+    writeToOppRec: function () {
+        //write to opponents record
+        //write:  1. ID to oppID   2. name to OppName  3. choice to oppChoice
+        dbOppStorageArea.set(connectionObj.currUserRec.outRec);
+
+    },
+
+
     triggerRefreshScreen: function () {
         connectionObj.refreshScreenBit = !connectionObj.refreshScreenBit;
-        if ( connectionObj.refreshScreenBit ){
+        if (connectionObj.refreshScreenBit) {
             dbRefreshScreenBit.set(true);
         } else {
             dbRefreshScreenBit.set(false);
         };
     },
 
+
+    writeDBtoInRec: function( dataInRec ) {
+        //copies incoming record to memory slot
+        this.currUserRec.inRec = jQuery.extend( true, {}, dataInRec.val() );
+    },
+
+
     retUserOnLineName: function (userNum) {
         //returns the users name from the array
         var outVal = "";
-        outVal = connectionObj.usersOnLine[userNum].name;
+        outVal = connectionObj.usersOnLine[userNum].outRec.name;
         return outVal;
     },
+
 
     retUserOnLineRec: function (userNum) {
         //not sure this is an editable object
@@ -150,7 +184,7 @@ var connectionObj = {
 var startConnection = function () {
     console.log("connecting");
     firebase.initializeApp(connConfig);
-console.log("entered the routine");
+    console.log("entered the routine");
     // Create a variable to reference the database.
     database = firebase.database();
 
@@ -178,7 +212,7 @@ console.log("entered the routine");
 
             // Remove user from the connection list when they disconnect.
             con.onDisconnect().remove();
-            }
+        }
     });
 
     dbRefreshScreenBit.on("value", function (snap) {
@@ -190,7 +224,7 @@ console.log("entered the routine");
         } else {
             connectionObj.refreshScreenBit = false;
         };
-            //refresh the user list
+        //refresh the user list
         //dispAllUsersOnPage_start(true);
     });
 
@@ -203,25 +237,38 @@ console.log("entered the routine");
         //only change the user name if the linkActice switches
         if (connectionObj.linkActive === false) {
             connectionObj.linkActive = true;  //link is active
-            //connectionObj.currUserRec.userID = configData.firebaseStorage + numeral(connectionObj.currNumberOfConn).format("0000");
-            // connectionObj.currUserRec.userID = configData.firebaseStorage + firebase.database.ServerValue.TIMESTAMP;            
-            connectionObj.currUserRec.userID = configData.firebaseStorage + moment().valueOf();            
-            dbUserStorageArea = database.ref(connectionObj.currUserRec.userID);          
+            connectionObj.currUserRec.outRec.ID = configData.firebaseStorage + moment().valueOf();
+            dbUserStorageArea = database.ref(connectionObj.currUserRec.outRec.ID);
             dbUserStorageArea.onDisconnect().remove();
-console.log("started the connection");
+            console.log("started the connection");
             connectionObj.writeCurrUserRec();
-//            dispAllUsersOnPage_start(true);   //refresh entire area
+            //            dispAllUsersOnPage_start(true);   //refresh entire area
             showLinkButtonStatus();
+
+            //now get the incoming record's location and set a listener on it
+            dbIncomingRec = database.ref(connectionObj.currUserRec.outRec.ID + "/inRec");
+            dbIncomingRec.on("value", function (snap) {
+                //a new incoming record
+                //store the record to memory
+                connectionObj.writeDBtoInRec(snap);
+                evalIncomingRec();
+            });
         };
         console.log("new connection detected");
-        setTimeout ( dispAllUsersOnPage_start(true), 5000  ); 
+        setTimeout(dispAllUsersOnPage_start(true), 5000);
     });
+};
+
+
+var evalIncomingRec = function() {
+    console.log("incoming record from: " + connectionObj.currUserRec.inRec.name );
 };
 
 
 var stopConnection = function () {
 
 };
+
 
 var showLinkButtonStatus = function () {
     //display the proper link button status

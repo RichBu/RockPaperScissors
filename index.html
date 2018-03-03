@@ -132,7 +132,7 @@
                 console.log("submit clicked");
                 event.preventDefault();
                 connectionObj.initCurrUserRec();
-                connectionObj.currUserRec.name = $(configData.inputUserName).val().trim();
+                connectionObj.currUserRec.outRec.name = $(configData.inputUserName).val().trim();
                 connectionObj.setUserReadyToPlay();
                 console.log("set user to play");
                 startConnection();  //start connection
