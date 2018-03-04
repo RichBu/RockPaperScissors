@@ -68,22 +68,70 @@
             </div>
         </div>
         <div class="row ">
-            <h3> Current Users on-line : </h3>
-            <div id="currUsers">
-                <span>me</span>
+            <table>
+                <col width="20%">
+                <col wudth="15%">
+                <col width="20%">
+                <col width="20%">
+                <tr>
+                    <td class "table-status">
+                        <h3>Status:</h3>
+                    </td>
+                    <td>
+                        <br/>
+                        <span>game status</span>
+                    </td>
+                    <td>
+                        <span>logged in as: </span>
+                        <span id="userName">user name</span>
+                        <br/>
+                        <span>playing: </span>
+                        <span id="oppName">----</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!--  "heading" for number of users" -->
+        <hr/>
+        <div class="row ">
+            <div style="float:left;">
+                <button style="display:inline; " id="btnUsersMenu" class="bigButton " data-toggle="tooltip " title="open/close user list">
+                    <span class="glyphicon glyphicon-menu-down"></span>
+                </button>
+            </div>
+            <div style="float:left;">
+                <span style="display:inline; ">
+                    <h4>Current Users on-line : </h4>
+                </span>
+            </div>
+            <div style="position: relative; top:10px; left:10px;">
+                <span id="numUsers" style="display:inline">not on-line</span>
             </div>
         </div>
-        <div class="row ">
-            <h3> Status: </h3>
-            <span id="numUsers"></span>
+        <div id="userDiv" class="panel panel-succes" style="max-height:300px; overflow: auto; overflow-y: auto;">
+            <div class="panel-body" style="height:100%">
+                <div id="currUsers">
+                    <span>me</span>
+                </div>
+            </div>
         </div>
-        <div class="row" id="inputForm">
-            <form id="user-form">
-                <label for="text-input">User Name</label>
-                <input type="text" id="input-userName">
-                <!-- Button triggers new movie to be added -->
-                <input id="bttnUserInput" type="submit" value="Submit">
-            </form>
+    </div>
+    <!-- Login Modal -->
+    <div id="modLogin" class="modal">
+        <div class="modal-content">
+            <span id="closeModLogin" class="close">&times;</span>
+            <h2>
+                <p>Need to Login </p>
+            </h2>
+            <p> </p>
+            <div class="row" id="inputForm">
+                <form id="user-form">
+                    <label for="text-input">User Name</label>
+                    <input type="text" id="input-userName">
+                    <!-- Button triggers new movie to be added -->
+                    <input id="bttnUserInput" type="submit" value="Login">
+                </form>
+            </div>
         </div>
     </div>
 
@@ -127,6 +175,8 @@
 
             $(document.body).on("click", ".user_select", evalUserSelect);
 
+            modalInput.style.display = "block";
+
             $(configData.idBttnUserInput).on("click", function (event) {
                 //submit button was pushed
                 console.log("submit clicked");
@@ -137,6 +187,7 @@
                 console.log("set user to play");
                 startConnection();  //start connection
                 console.log("connected");
+                modalInput.style.display = "none";
             });
 
             $(configData.idBttnTest).on("click", function (event) {

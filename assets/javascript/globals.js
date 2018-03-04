@@ -30,16 +30,19 @@ var dbIncomingRec;
 var dbOppStorageArea;
 var dbRefreshScreenBit;
 
-Date.prototype.getUnixTime = function() { return this.getTime()/1000|0 };
-if(!Date.now) Date.now = function() { return new Date(); }
-Date.time = function() { return Date.now().getUnixTime(); }
+var modalInput = document.getElementById('modLogin'); //movie times
+
+
+Date.prototype.getUnixTime = function () { return this.getTime() / 1000 | 0 };
+if (!Date.now) Date.now = function () { return new Date(); }
+Date.time = function () { return Date.now().getUnixTime(); }
 
 var gameObj = {
     //everything for playing the game
-    currStatus: { 
+    currStatus: {
         //object for current status
         stateLevel: 0,  //state of the game play
-        retStatus: function() {
+        retStatus: function () {
             //returns status of current game
             statusMessage = [
                 'startup waiting for user login',   //0
@@ -51,28 +54,64 @@ var gameObj = {
                 'waiting for both answers to come in ',     //10
                 'processing the game '                      //15
             ];
-        }
+        },
+        dispUsersStatus: true
     },
 
-    promptWantNewGame: function() {
+    promptWantNewGame: function () {
         var promptStr = connectionObj.currUserRec.inRec.name + " wants to play a game \n";
         promptStr += "type Yes to continue ";
-        var ansPlayGame = prompt( promptStr, "Yes" );  
+        var ansPlayGame = prompt(promptStr, "Yes");
         ansPlayGame = "Yes"; // default
         ansPlayGame = ansPlayGame.trim().toUpperCase();
         var userAnsChar = ansPlayGame[0];
-        if( userAnsChar === "Y" ) {
+        if (userAnsChar === "Y") {
             //the user picked yes
             //set the "A" bit, and write the record
             connectionObj.currUserRec.outRec.choice = "A";
             //set up the storage pointer
             connectionObj.currUserRec.isPlaying = true;
-            dbOppStorageArea = database.ref( connectionObj.currUserRec.inRec.ID + "/inRec" );
+            dbOppStorageArea = database.ref(connectionObj.currUserRec.inRec.ID + "/inRec");
             //write the entire record including the outRec
             //this is because want to set "IsPlaying"
-            connectionObj.writeCurrUserRec();  
+            connectionObj.writeCurrUserRec();
             connectionObj.writeToOppRec();
         };
+    }
+};
+
+
+var dispUserSect = function (cmdIn) {
+    //if cmdIn:  -1=toggle  0=off  1=on  2=refresh
+    var dispUsersOn = function () {
+        $("#userDiv").css("display", "block");
+    };
+
+    var dispUsersOff = function () {
+        $("#userDiv").css("display", "none");
+    };
+
+    switch (parseInt(cmdIn)) {
+        case -1:    //toggle
+            if (gameObj.currStatus.dispUsersStatus === true) {
+                gameObj.currStatus.dispUsersStatus = false;
+                dispUsersOff();
+            } else {
+                //display was off, turn on and store
+                gameObj.currStatus.dispUsersStatus = true;
+                dispUsersOn();
+            };
+            break;
+        case 0:     //force off
+            gameObj.currStatus.dispUsersStatus = false;
+            dispUsersOff();
+            break;
+        case 1:     //force on
+            gameObj.currStatus.dispUsersStatus = true;
+            dispUsersOn();
+            break;
+        case 2:     //refresh only
+            break;
     }
 };
 
@@ -145,16 +184,16 @@ var dispAllUsersOnPage_contin = function () {
         $(statusFooterText).appendTo(statusFooter);
         $(statusFooter).appendTo(rowStatusFooter);
         $(rowStatusFooter).prependTo(divCurrUsers);
-        if ( endVal < connectionObj.currNumberOfConn ) {
+        if (endVal < connectionObj.currNumberOfConn) {
             //do not have all the user's names, so loop back around
             //watch out, maybe infinite loop
-            setTimeout( dispAllUsersOnPage_start(true),1000 );
+            setTimeout(dispAllUsersOnPage_start(true), 1000);
         };
     };
 }; // disp Users On Page
 
 
-var evalUserSelect = function() {
+var evalUserSelect = function () {
     //clicked on a user
     var userClick = $(this).attr("data-user-select");
     //this will now correspond to the usersOnLine[] array
@@ -163,13 +202,13 @@ var evalUserSelect = function() {
     var cuStack = connectionObj.usersOnLine;  //use as input
     var oppRec = cuStack[userClick].outRec; //the actual record of the opponent
     var currRec = connectionObj.currUserRec;  //use as output
-    if( oppRec.ID === currRec.outRec.ID) {
+    if (oppRec.ID === currRec.outRec.ID) {
         //user picked himself
-        alert( "you picked yourself");
+        alert("you picked yourself");
     } else {
         //out record goes to the in record of the opponent
-        dbOppStorageArea = database.ref( oppRec.ID + "/inRec" );
-    
+        dbOppStorageArea = database.ref(oppRec.ID + "/inRec");
+
         currRec.inRec.ID = oppRec.ID;
         currRec.inRec.name = oppRec.name;
         currRec.inRec.msg = oppRec.msg;

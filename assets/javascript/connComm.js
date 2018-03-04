@@ -271,6 +271,9 @@ var evalIncomingRec = function () {
             connectionObj.writeCurrUserRec();  
             break;
         case "-":   //ready for game to begin
+            //should only trigger once, so reset output bit also
+            connectionObj.currUserRec.outRec.choice = "-";
+            connectionObj.writeCurrUserRec();              
             break;
         case "?":   //wants to play a game
             gameObj.promptWantNewGame();
