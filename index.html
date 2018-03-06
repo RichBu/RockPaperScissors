@@ -108,6 +108,7 @@
                 <span id="numUsers" style="display:inline">not on-line</span>
             </div>
         </div>
+        <!-- number of users in a list or table form go here -->
         <div id="userDiv" class="panel panel-succes" style="max-height:300px; overflow: auto; overflow-y: auto;">
             <div class="panel-body" style="height:100%">
                 <div id="currUsers">
@@ -115,6 +116,7 @@
                 </div>
             </div>
         </div>
+
     </div>
     <!-- Login Modal -->
     <div id="modLogin" class="modal">
@@ -170,6 +172,7 @@
             // (Ex. 3.0 != 3.7.0)
 
             showLinkButtonStatus();
+            dispUserSect(1);  //turn on the user section
 
             $(configData.idBttnLink).on("click", startConnection);
 
@@ -197,6 +200,10 @@
                 connectionObj.writeCurrUserRec();
             });
 
+            $("#btnUsersMenu").on("click", function (event) {
+                //user clicked on the user menu
+                dispUserSect(-1);
+            })
 
             //fire base layous
             // - connections = all the connected users

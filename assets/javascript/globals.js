@@ -141,6 +141,95 @@ var dispAllUsersOnPage_contin = function () {
         var divCurrUsers = configData.divCurrUsers;
         $(divCurrUsers).html("");  //wipe out the section
         //add break between active and non-active players
+        //layout will have to be 
+        //
+        //<table class="table table-hover">
+        //<thead><tr>   <th> # </th>  </tr> 
+        //<tbody> <tr> <th scope="row">1</th>
+        //  <td></td>  <td>/td>
+        //  </tbody>
+        //</table>
+        var tableTag = $("<table>");
+        $(tableTag).addClass("table");
+        $(tableTag).addClass("table-hover");
+
+        var tableHeadTag = $("<thead>");
+        var trTag = $("<tr>");
+        var thTag = $("<th>");
+        thTag.text("#");
+        $(thTag).appendTo(trTag);
+        thTag = $("<th>");
+        $(thTag).text("User");
+        $(thTag).appendTo(trTag);
+        thTag = $("<th>");
+        $(thTag).text("Status");
+        $(thTag).appendTo(trTag);
+        $(trTag).appendTo(tableHeadTag);
+        $(tableHeadTag).appendTo(tableTag);
+
+        //so the top of the table is finished, now add in the body
+        var tableBodyTag = $("<tbody>");  //append every <tr> to here
+
+        //now loop thru all the names and put on-line
+        var endVal = connectionObj.usersOnLine.length;
+        for (var i = 0; i < endVal; i++) {  //each new button is on a new row
+            trTag = $("<tr>");
+            thTag = $("<th scope='row'>");  //put in user number
+            thTag.text(i+1);  //row / user number
+            thTag.appendTo(trTag);
+    
+            tdTag = $("<td>");
+            $(tdTag).text( connectionObj.retUserOnLineName(i) );  //user name
+            $(tdTag).appendTo(trTag);
+            //is or is not playing
+            tdTag = $("<td>");
+
+            var lineText = ""
+            if (connectionObj.retUserOnLineRec(i).isPlaying) {
+                lineText = " playing against " + connectionObj.retUserOnLineRec(i).inRec.name;
+            } else {
+                lineText = " free to play";
+            };
+
+            $(tdTag).text(lineText);
+            $(tdTag).appendTo(trTag);
+            
+            $(trTag).attr("data-user-select", i);
+            $(trTag).addClass("user_select");
+
+            if (connectionObj.retUserOnLineRec(i).isPlaying) {
+                $(trTag).appendTo( tableBodyTag );
+            } else {
+                //if it is an active user that can play then
+                //put at the top of the screen and wrap with a button
+                $(trTag).prependTo( tableBodyTag );
+            };
+        };
+
+        $(tableBodyTag).appendTo( tableTag );
+        $(tableTag).appendTo( divCurrUsers );
+
+        if (endVal < connectionObj.currNumberOfConn) {
+            //do not have all the user's names, so loop back around
+            //watch out, maybe infinite loop
+            setTimeout(dispAllUsersOnPage_start(true), 1000);
+        };
+    };
+}; // disp Users On Page
+
+
+var dispAllUsersOnPage_contin_oldVersion = function () {
+    //display all of the users currently on-line
+    //if want to pull all the data in, then set refresh to true
+    //this function assumes that all the data is already in the array if not
+    //first make sure that it is on-line
+    console.log("another user");
+    if (connectionObj.linkActive) {
+        //only if link is active
+        //watch out for infinite loop
+        var divCurrUsers = configData.divCurrUsers;
+        $(divCurrUsers).html("");  //wipe out the section
+        //add break between active and non-active players
         var rowStatusHeader = $("<div>").addClass("row");
         var statusHeader = $("<p>");
         var statusHeaderText = $("<span>");
