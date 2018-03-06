@@ -133,7 +133,8 @@ var connectionObj = {
 
     writeCurrUserRec: function () {
         dbUserStorageArea.set(connectionObj.currUserRec);
-        //connectionObj.triggerRefreshScreen();
+        //do I want to refresh every time I write the curr User Rec ???
+        connectionObj.triggerRefreshScreen();
     },
 
 
@@ -227,7 +228,8 @@ var startConnection = function () {
             connectionObj.refreshScreenBit = false;
         };
         //refresh the user list
-        //dispAllUsersOnPage_start(true);
+        //make sure that it doesn't pop the window open
+        dispAllUsersOnPage_start(true);
     });
 
     // When first loaded or when the connections list changes...
@@ -257,7 +259,7 @@ var startConnection = function () {
             });
         };
         console.log("new connection detected");
-        setTimeout(dispAllUsersOnPage_start(true), 5000);
+        //setTimeout(dispAllUsersOnPage_start(true), 5000);
     });
 };
 
@@ -269,6 +271,7 @@ var evalIncomingRec = function () {
             connectionObj.currUserRec.isPlaying = true;
             connectionObj.currUserRec.outRec.choice = "-";
             connectionObj.writeCurrUserRec();  
+            $( "#oppName"  ).text(  connectionObj.currUserRec.inRec.name);
             break;
         case "-":   //ready for game to begin
             //should only trigger once, so reset output bit also
@@ -287,7 +290,6 @@ var evalIncomingRec = function () {
         case "S":   //picked scissors
             break;
     };
-
 };
 
 

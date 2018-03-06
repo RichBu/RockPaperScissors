@@ -30,7 +30,9 @@ var dbIncomingRec;
 var dbOppStorageArea;
 var dbRefreshScreenBit;
 
-var modalInput = document.getElementById('modLogin'); //movie times
+var modalInput = document.getElementById('modLogin'); //login
+var modalNewOppReq = document.getElementById('modNewOppReq'); //new opponent request
+
 
 
 Date.prototype.getUnixTime = function () { return this.getTime() / 1000 | 0 };
@@ -58,25 +60,46 @@ var gameObj = {
         dispUsersStatus: true
     },
 
+
     promptWantNewGame: function () {
-        var promptStr = connectionObj.currUserRec.inRec.name + " wants to play a game \n";
-        promptStr += "type Yes to continue ";
-        var ansPlayGame = prompt(promptStr, "Yes");
-        ansPlayGame = "Yes"; // default
-        ansPlayGame = ansPlayGame.trim().toUpperCase();
-        var userAnsChar = ansPlayGame[0];
-        if (userAnsChar === "Y") {
-            //the user picked yes
-            //set the "A" bit, and write the record
-            connectionObj.currUserRec.outRec.choice = "A";
-            //set up the storage pointer
-            connectionObj.currUserRec.isPlaying = true;
-            dbOppStorageArea = database.ref(connectionObj.currUserRec.inRec.ID + "/inRec");
-            //write the entire record including the outRec
-            //this is because want to set "IsPlaying"
-            connectionObj.writeCurrUserRec();
-            connectionObj.writeToOppRec();
-        };
+        modalNewOppReq.style.display = "block";
+        $("#oppNameReq").text(connectionObj.currUserRec.inRec.name);
+
+        //now, a modal is up and when a user clicks accept or decline
+        //then two other functions are called
+    },
+
+
+    promptWantNewGame_accept: function () {
+        //user accepted the invitation
+        //the user picked yes
+        //set the "A" bit, and write the record
+        connectionObj.currUserRec.outRec.choice = "A";
+        //set up the storage pointer
+        connectionObj.currUserRec.isPlaying = true;
+        dbOppStorageArea = database.ref(connectionObj.currUserRec.inRec.ID + "/inRec");
+        //write the entire record including the outRec
+        //this is because want to set "IsPlaying"
+        connectionObj.writeCurrUserRec();
+        connectionObj.writeToOppRec();
+        //display the opponent on the page
+        $( "#oppName"  ).text(  connectionObj.currUserRec.inRec.name);
+        modalNewOppReq.style.display = "none";
+    },
+
+
+    promptWantNewGame_decline: function () {
+        //user declined / rejected the invitation
+        //set the "X" bit for disconnect, and write the record
+        connectionObj.currUserRec.outRec.choice = "X";
+        //set up the storage pointer
+        connectionObj.currUserRec.isPlaying = false;
+        dbOppStorageArea = database.ref(connectionObj.currUserRec.inRec.ID + "/inRec");
+        //write the entire record including the outRec
+        //this is because want to set "IsPlaying"
+        connectionObj.writeCurrUserRec();
+        connectionObj.writeToOppRec();
+        modalNewOppReq.style.display = "none";
     }
 };
 
@@ -171,15 +194,17 @@ var dispAllUsersOnPage_contin = function () {
         var tableBodyTag = $("<tbody>");  //append every <tr> to here
 
         //now loop thru all the names and put on-line
-        var endVal = connectionObj.usersOnLine.length;
+        //it was connectionObj.usersOnLine.length;  but got duplicates, so whichever is smaller
+        var endVal = connectionObj.currNumberOfConn;
+        if (connectionObj.usersOnLine.length < endVal) { endVal = connectionObj.usersOnLine.length; }
         for (var i = 0; i < endVal; i++) {  //each new button is on a new row
             trTag = $("<tr>");
             thTag = $("<th scope='row'>");  //put in user number
-            thTag.text(i+1);  //row / user number
+            thTag.text(i + 1);  //row / user number
             thTag.appendTo(trTag);
-    
+
             tdTag = $("<td>");
-            $(tdTag).text( connectionObj.retUserOnLineName(i) );  //user name
+            $(tdTag).text(connectionObj.retUserOnLineName(i));  //user name
             $(tdTag).appendTo(trTag);
             //is or is not playing
             tdTag = $("<td>");
@@ -193,21 +218,21 @@ var dispAllUsersOnPage_contin = function () {
 
             $(tdTag).text(lineText);
             $(tdTag).appendTo(trTag);
-            
+
             $(trTag).attr("data-user-select", i);
             $(trTag).addClass("user_select");
 
             if (connectionObj.retUserOnLineRec(i).isPlaying) {
-                $(trTag).appendTo( tableBodyTag );
+                $(trTag).appendTo(tableBodyTag);
             } else {
                 //if it is an active user that can play then
                 //put at the top of the screen and wrap with a button
-                $(trTag).prependTo( tableBodyTag );
+                $(trTag).prependTo(tableBodyTag);
             };
         };
 
-        $(tableBodyTag).appendTo( tableTag );
-        $(tableTag).appendTo( divCurrUsers );
+        $(tableBodyTag).appendTo(tableTag);
+        $(tableTag).appendTo(divCurrUsers);
 
         if (endVal < connectionObj.currNumberOfConn) {
             //do not have all the user's names, so loop back around

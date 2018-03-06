@@ -55,10 +55,10 @@
                 </div>
                 <div class="row ">
                     <!-- This is the column with buttons -->
-                    <button style="Float: left; " id="btnLink" class="bigButton " data-toggle="tooltip " title="Initiate an on-line link">LINK</button>
-                    <button style="Float: left; " id="btnStart" class="bigButton " data-toggle="tooltip " title="start the game">START</button>
-                    <button style="Float: left; " id="btnTest" class="bigButton " data-toggle="tooltip " title="test">TEST</button>
-                    <button style="Float: left; " id="btnHelp" class="bigButton " data-toggle="tooltip " title="Help and about">
+                    <button style="Float: left; " id="btnLink" class="bigButton" data-toggle="tooltip " title="Initiate an on-line link">LINK</button>
+                    <button style="Float: left; " id="btnStart" class="bigButton" data-toggle="tooltip " title="start the game">START</button>
+                    <button style="Float: left; " id="btnTest" class="bigButton" data-toggle="tooltip " title="test">TEST</button>
+                    <button style="Float: left; " id="btnHelp" class="bigButton" data-toggle="tooltip " title="Help and about">
                         <span class="glyphicon glyphicon-info-sign"></span>
                     </button>
                     <button style="Float: left; " id="btnSettings" class="bigButton " data-toggle="tooltip " title="Settings for game">
@@ -120,7 +120,7 @@
     </div>
     <!-- Login Modal -->
     <div id="modLogin" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width:40%;">
             <span id="closeModLogin" class="close">&times;</span>
             <h2>
                 <p>Need to Login </p>
@@ -133,6 +133,44 @@
                     <!-- Button triggers new movie to be added -->
                     <input id="bttnUserInput" type="submit" value="Login">
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite to play Modal -->
+    <div id="modNewOppReq" class="modal">
+        <div class="modal-content" style="max-width:40%">
+            <span id="closeModNewOppReq" class="close">&times;</span>
+            <h2>
+                <p>Invite to Play</p>
+            </h2>
+            <p> </p>
+            <div class="row">
+                <span id="oppNameReq">
+                    <h3>user </h3>
+                </span>
+                <p>wants to play a game with you</p>
+                <button style="Float: left;" class="bigButton" id="acceptGame">Accept</button>
+                <button style="Float: left;" class="bigButton" id="declineGame">Decline</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Waiting for user Modal -->
+    <div id="modWaitInviteAck" class="modal">
+        <div class="modal-content" style="max-width:40%">
+            <span id="closeModWaitInviteAck" class="close">&times;</span>
+            <h2>
+                <p>Waiting for Accept</p>
+            </h2>
+            <p> </p>
+            <div class="row">
+                <span id="oppNameReq">
+                    <h3>user </h3>
+                </span>
+                <p>has not replied yet</p>
+                <button style="Float: left;" class="bigButton" id="cancelInviteReq">Cancel</button>
             </div>
         </div>
     </div>
@@ -191,6 +229,7 @@
                 startConnection();  //start connection
                 console.log("connected");
                 modalInput.style.display = "none";
+                $("#userName").text(connectionObj.currUserRec.outRec.name);
             });
 
             $(configData.idBttnTest).on("click", function (event) {
@@ -204,6 +243,11 @@
                 //user clicked on the user menu
                 dispUserSect(-1);
             })
+
+            //the invite to play buttons
+            $("#acceptGame").on("click", gameObj.promptWantNewGame_accept);
+            $("#declineGame").on("click", gameObj.promptWantNewGame_decline);
+
 
             //fire base layous
             // - connections = all the connected users
